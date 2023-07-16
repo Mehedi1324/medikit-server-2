@@ -1,12 +1,8 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import { MongoClient, ObjectId, ServerApiVersion } from 'mongodb';
-
-const port = process.env.PORT || 1010;
+const express = require('express');
 const app = express();
-
-dotenv.config();
+const port = process.env.PORT || 1010;
+const cors = require('cors');
+require('dotenv').config();
 
 //  Middleware___________
 
@@ -18,6 +14,7 @@ app.get('/', (req, res) => {
   res.send('Welcome to M-kit backend server');
 });
 
+const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.cgyk5.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -40,22 +37,23 @@ async function run() {
       const product = await cursor.toArray();
       res.send(product);
     });
-    // Finding single product from stored products______
-
-    app.get('/product/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const product =
-        (await featureCollection.findOne(query)) ||
-        (await newCollection.findOne(query));
-      res.send(product);
-    });
 
     // Feature Products ______________
 
     app.get('/feature', async (req, res) => {
       const cursor = featureCollection.find({});
       const product = await cursor.toArray();
+      res.send(product);
+    });
+
+    // Finding single product from stored products______
+
+    app.get('/product/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const product =
+        (await featureCollection.findOne(query)) ||
+        (await newCollection.findOne(query));
       res.send(product);
     });
 
